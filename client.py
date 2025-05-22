@@ -296,7 +296,7 @@ def handle_command(cmd):
 
 # ========== CLIENT MAIN ==========
 
-HOST = '192.168.2.5'  # Remplacez par l'adresse IP du serveur
+HOST = '192.168.2.4'  # Remplacez par l'adresse IP du serveur
 PORT = 12345
 
 # Création du socket client

