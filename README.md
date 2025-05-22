@@ -1,6 +1,3 @@
-# RAT
-
-
 # 🕵️‍♂️ Python Remote Access Tool (RAT)
 
 > 📌 Projet réalisé dans le cadre d'un projet annuel scolaire – **à des fins exclusivement éducatives**.
@@ -29,18 +26,19 @@ Ce RAT (Remote Access Tool) développé en Python permet :
 - 🔐 Récupération des mots de passe Wi-Fi (`get_wifi_creds`)
 - 🔑 Extraction des mots de passe Firefox (`get_firefox_passwords`)
 - 👁️ Liste des profils Firefox (`get_firefox_profiles`)
+- 👥 **Contrôle multi-clients simultanés** (thread safe + menu interactif)
 
 ---
 
 ## 🧱 Architecture
 
-- **client.py** : l’agent RAT installé sur la machine cible
-- **server.py** : le centre de commande (C2) contrôlé par l’opérateur
-- **firefox_decrypt.py** : script tiers intégré pour déchiffrer les mots de passe Firefox
+- **`client.py`** : l’agent RAT installé sur la machine cible
+- **`server.py`** : le serveur C2 (Command & Control) contrôlé par l’opérateur
+- **`firefox_decrypt.py`** : outil intégré pour extraire les mots de passe Firefox
 
 ---
 
-## 💻 Commandes supportées (depuis le serveur)
+## 💻 Commandes disponibles (depuis le serveur)
 
 | Commande                      | Description                                      |
 |------------------------------|--------------------------------------------------|
@@ -48,23 +46,40 @@ Ce RAT (Remote Access Tool) développé en Python permet :
 | `screenshot`                 | Capture d’écran locale                          |
 | `webcam`                     | Capture photo via webcam                        |
 | `start_keylogger`            | Lance un keylogger en tâche de fond             |
-| `get_ip`                     | Renvoie l'adresse IP locale du client           |
-| `generate_ssh_key`           | Génère une paire de clés SSH                    |
-| `get_wifi_creds`             | Récupère les réseaux Wi-Fi enregistrés + PSK    |
-| `get_firefox_profiles`       | Affiche les profils Firefox disponibles         |
-| `get_firefox_passwords <n>`  | Extrait les mots de passe du profil choisi      |
+| `get_ip`                     | Affiche l'adresse IP locale du client           |
+| `generate_ssh_keypair`       | Génère une paire de clés SSH                    |
+| `wifi`                       | Récupère les réseaux Wi-Fi + mots de passe      |
+| `firefox_profiles`           | Affiche les profils Firefox disponibles         |
+| `firefox_password <id>`      | Extrait les mots de passe du profil Firefox     |
 | `download <f1>;<f2>;...`     | Télécharge un ou plusieurs fichiers du client   |
+| `disconnect`                 | Ferme proprement la session avec un client      |
+| `exit`                       | Quitte le mode client et retourne au menu       |
 
 ---
 
-## 🛠️ Prérequis
+## 🧑‍💻 Interface multi-clients
 
-Côté client :
+- Liste dynamique des clients connectés
+- Contrôle interactif d’un client à la fois
+- Possibilité de **retourner au menu principal**
+- Déconnexion propre et gestion des sockets avec `threading.Lock`
+
+---
+
+## 🛠️ Prérequis (client)
+
 - Python 3.8+
-- Modules : `paramiko`, `pynput`, `pyautogui`, `opencv-python`, `libnss3` (Linux)
+- Modules :
+  - `paramiko`
+  - `pynput`
+  - `pyautogui`
+  - `opencv-python`
+  - `Pillow`
+- Linux uniquement :
+  - `libnss3` (pour le support de Firefox)
 
 Installation :
+
 ```bash
 pip install -r requirements.txt
 sudo apt install libnss3
-

