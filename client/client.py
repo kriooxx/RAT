@@ -1,4 +1,5 @@
 import socket
+import time
 import subprocess
 import os 
 import paramiko
@@ -296,7 +297,7 @@ def handle_command(cmd):
 
 # ========== CLIENT MAIN ==========
 
-HOST = '192.168.2.4'  
+HOST = "192.168.2.4"
 PORT = 12345
 
 #création du socket client
