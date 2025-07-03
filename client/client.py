@@ -296,17 +296,17 @@ def handle_command(cmd):
 
 # ========== CLIENT MAIN ==========
 
-HOST = '192.168.2.4'  # Remplacez par l'adresse IP du serveur
+HOST = '192.168.2.4'  
 PORT = 12345
 
-# Création du socket client
+#création du socket client
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
 
 print(f"Connecté au serveur {HOST}:{PORT}")
 
 
-# Échange des messages
+#échange des messages
 try:
     while True:
         command = client_socket.recv(4096).decode().strip().lower()

@@ -1,15 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for
 import socket
 import threading
-import time  # ✅ correction ici (pas 'sleep')
+import time  
 
+#création de l'appli Flask
 app = Flask(__name__)
 
 clients = []
 client_lock = threading.Lock()
 selected_client = {}
 
-# Config socket
+#config socket
 HOST = '0.0.0.0'
 PORT = 12345
 

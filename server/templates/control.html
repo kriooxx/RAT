@@ -7,7 +7,7 @@
 </head>
 <body class="bg-light">
 <div class="container py-4">
-    <h2>🎮 Contrôle de Client {{ client.id }}</h2>
+    <h2>Contrôle de Client {{ client.id }}</h2>
     <p class="text-muted">IP : {{ client.addr[0] }} | Port : {{ client.addr[1] }}</p>
 
     <form method="POST" class="mb-3">
@@ -24,7 +24,7 @@
     </div>
 
     {% if client.history %}
-        <h4>📝 Historique :</h4>
+        <h4>Historique :</h4>
         <ul class="list-group">
             {% for cmd, res in client.history %}
                 <li class="list-group-item">
