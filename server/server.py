@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 import socket
 import threading
 import time  
+import ssl
 
 #création de l'appli Flask
 app = Flask(__name__)
@@ -15,13 +16,17 @@ HOST = '0.0.0.0'
 PORT = 12345
 
 def create_socket():
+    context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    context.load_cert_chain(certfile='cert.pem', keyfile='key.pem')
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     time.sleep(1)
     s.bind((HOST, PORT))
     s.listen(5)
     print(f"[+] Serveur Flask en attente de connexions sur {HOST}:{PORT}")
-    return s
+
+    return context.wrap_socket(s, server_side=True)
 
 def accept_clients(server_socket):
     client_id = 1

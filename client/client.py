@@ -1,4 +1,5 @@
 import socket
+import ssl
 import time
 import subprocess
 import os 
@@ -301,8 +302,12 @@ HOST = "192.168.2.4"
 PORT = 12345
 
 #création du socket client
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((HOST, PORT))
+context = ssl.create_default_context()
+context.check_hostname = False
+context.verify_mode = ssl.CERT_NONE
+
+sock = socket.create_connection((HOST, PORT))
+client_socket = context.wrap_socket(sock, server_hostname=HOST)
 
 print(f"Connecté au serveur {HOST}:{PORT}")
 
