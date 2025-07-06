@@ -21,6 +21,9 @@
         <a href="{{ url_for('disconnect_client', client_id=client.id) }}" class="btn btn-danger">Déconnecter ce client</a>
         <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#helpModal">Aide</button>
         <a href="{{ url_for('index') }}" class="btn btn-secondary">Retour</a>
+        <form method="POST" action="{{ url_for('clear_history', client_id=client.id) }}" class="d-inline">
+          <button type="submit" class="btn btn-warning">Clear</button>
+      </form>      
     </div>
 
     {% if client.history %}

