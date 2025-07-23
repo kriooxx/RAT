@@ -160,6 +160,7 @@ def capture_webcam(filename="webcam.jpg"):
 def screenshot():
     try: 
         screenshot = pyautogui.screenshot()
+        screnshot = screenshot.convert("RBG")
         screenshot.save("screenshot.jpg", "JPEG")
         return "Capture d'écran sauvegardée en format .jpg sous 'screenshot.jpg'."
     except Exception as e:

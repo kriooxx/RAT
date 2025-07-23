@@ -21,6 +21,7 @@ pip3 install pyautogui --break-system-packages &>/dev/null
 pip3 install opencv-python --break-system-packages &>/dev/null
 pip3 install pillow --break-system-packages &>/dev/null
 pip3 install pynput --break-system-packages &>/dev/null
+sudo apt install gnome-screenshot -y &>/dev/null
 
 #compilation du binaire via PyInstaller
 echo "[+] Compilation du client.py en binaire discret..."
